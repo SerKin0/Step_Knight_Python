@@ -42,6 +42,50 @@ def BFS(mass, max_step=2):
     return -1, mass
 
 
+def BFS_recursion(mass: list, step: int, coord: list, max_step=2):
+    if step < max_step:
+        # Координаты куда будут ставиться следующие шаги
+        tmp_coord = []
+        # Патерны движения коня на доске
+        pattern_x, pattern_y = [1, 2, 2, 1, -1, -2, -2, -1], [-2, -1, 1, 2, 2, 1, -1, -2]
+        # Проходимся по всем координатам step шага
+        for x, y in coord:
+            for pat_x, pat_y in zip(pattern_x, pattern_y):
+                tmp_x, tmp_y = x + pat_x, y + pat_y
+                if check(tmp_x, tmp_y, mass=mass):
+                    # Если же мы доходим до конца, то возвращаем минимальное количество шагов и массив
+                    if -1 == mass[tmp_y][tmp_x]:
+                        return step + 1, mass
+                    # если нет, то просто продолжаем искать
+                    mass[tmp_y][tmp_x] = step + 1
+                    # Добавляем шаги
+                    tmp_coord.append((tmp_x, tmp_y))
+        return BFS_recursion(mass, step+1, tmp_coord, max_step)
+    else:
+        return -1, mass
+
+
+def BFS_cycle(mass: list, coord: list, max_step=2):
+    # Патерны движения коня на доске
+    pattern_x, pattern_y = [1, 2, 2, 1, -1, -2, -2, -1], [-2, -1, 1, 2, 2, 1, -1, -2]
+    for step in range(max_step):
+        # Координаты куда будут ставиться следующие шаги
+        tmp_coord = []
+        for x, y in coord:
+            for pat_x, pat_y in zip(pattern_x, pattern_y):
+                tmp_x, tmp_y = x + pat_x, y + pat_y
+                if check(tmp_x, tmp_y, mass=mass):
+                    # Если же мы доходим до конца, то возвращаем минимальное количество шагов и массив
+                    if -1 == mass[tmp_y][tmp_x]:
+                        return step + 1, mass
+                    # если нет, то просто продолжаем искать
+                    mass[tmp_y][tmp_x] = step + 1
+                    # Добавляем шаги
+                    tmp_coord.append((tmp_x, tmp_y))
+        coord = tmp_coord
+    return -1, mass
+
+
 # Поиск наикратчайшего пути по готовому массиву от конца до старта
 # Внимание: Работает только при условии, что мы нашли путь от начала до конца!
 def path_start(mass: list, min_step: int, fin_x: int, fin_y: int):
